@@ -1,143 +1,162 @@
-import { dao } from "dao.js"
+import { dao } from "./dao.js"
 
+export const service = {
+    clearMemory: function () {
+        return dao.clear()
+    },
 
-export function getProfList() {
-    return dao.getProfList()
-}
+    getProfList: function () {
+        return dao.getProfList()
+    },
 
-export function getGroupList() {
-    return dao.getGroupList()
-}
+    getGroupList: function () {
+        return dao.getGroupList()
+    },
 
-export function setProfList(profList) {
-    return dao.setProfList(profList)
-}
+    addProf: function (prof) {
+        const profList = dao.getProfList()
+        profList.push(prof)
+        dao.saveProfList(profList)
+    },
 
-export function setGroupList(groupList) {
-    return dao.setGroupList(groupList)
-}
+    removeProf: function (nameOfProfToRemove) {
+        let profList = dao.getProfList()
+        profList = profList.filter(prof => prof.name !== nameOfProfToRemove)
+        dao.saveProfList(profList)
+    },
 
-export function generateDistributions() {
-    const profList = dao.getProfList()
-    const groupList = dao.getGroupList()
-    const progress = document.getElementById("progress")
-    const results = []
-    let exploredLeaves = 0
-    const profs = profList.map(prof => ({
-        ...prof,
-        attribue: {}
-    }))
+    addGroup: function (group) {
+        const groupList = dao.getGroupList()
+        groupList.push(group)
+        dao.saveGroupList(groupList)
+    },
 
-    const currentHours = profs.map(() => 0)
+    removeGroup: function (nameOfGroupToRemove) {
+        let groupList = dao.getGroupList()
+        groupList = groupList.filter(group => group.name !== nameOfGroupToRemove)
+        dao.saveGroupList(groupList)
+    },
 
-    const totalLeaves = groupList.reduce(
-        (acc, group) =>
-            acc * combination(
-                group.quantity + profList.length - 1,
-                profList.length - 1
-            ),
-        1
-    )
+    generateDistributions: function () {
+        const service = this
+        const groupList = dao.getGroupList()
+        const profList = dao.getProfList().map(prof => ({
+            ...prof,
+            attribue: Object.fromEntries(
+                groupList
+                    .filter(group => group.min[prof.name])
+                    .map(group => [group.name, group.min[prof.name]])
+            )
+        }))
 
-    function combination(n, k) {
-        let result = 1
-        for (let i = 1; i <= k; i++) {
-            result *= (n - k + i)
-            result /= i
-        }
-        return result
-    }
+        const results = []
 
-    function saveSolution() {
-        results.push(
-            profs.map(prof => ({
-                ...prof,
-                attribue: { ...prof.attribue }
-            }))
-        );
-    }
+        const totalLeaves = groupList.reduce(
+            (acc, group) =>
+                acc * combination(
+                    (group.quantity - Object.values(group.min).reduce((acc, cur) => acc + cur, 0)) + profList.length - 1,
+                    profList.length - 1
+                ),
+            1
+        )
+        let exploredLeaves = 0
 
-    function backtrack(groupIndex = 0) {
-        if (groupIndex === groupList.length) {
-            exploredLeaves++
-            if (exploredLeaves % 100000 === 0) {
-                console.info(`${exploredLeaves.toLocaleString()} / ${totalLeaves.toLocaleString()} (${(100 * exploredLeaves / totalLeaves).toFixed(2)}%)`)
-            } if (
-                profs.every(
-                    (prof, i) => (currentHours[i] + _getHeureChair(prof) >= Number(prof.quantity))
-                        && (currentHours[i] + _getHeureChair(prof) <= Number(prof.max))
-                        && Object.entries(prof.attribue)
-                            .every(entry => (
-                                (_getGroup(entry[0]).max[prof.name] === undefined || entry[1] <= _getGroup(entry[0]).max[prof.name])
-                                && (_getGroup(entry[0]).min[prof.name] === undefined || entry[1] >= _getGroup(entry[0]).min[prof.name])
-                            ))
-                )
-            ) {
-                saveSolution()
+        function combination(n, k) {
+            let result = 1
+            for (let i = 1; i <= k; i++) {
+                result *= (n - k + i)
+                result /= i
             }
-            return
+            return result
         }
-        const group = groupList[groupIndex]
 
-        function distribute(profIndex, remaining) {
-            if (profIndex === profs.length - 1) {
-                const qty = remaining
-                profs[profIndex].attribue[group.name] = qty
-                currentHours[profIndex] += _getGroupHours(group, qty)
-                backtrack(groupIndex + 1)
-                currentHours[profIndex] -= _getGroupHours(group, qty)
-                delete profs[profIndex].attribue[group.name]
+        function saveSolution(profs) {
+            results.push(
+                profs.map(prof => ({
+                    ...prof,
+                    attribue: { ...prof.attribue },
+                    heures: service._calculHeuresProf(prof)
+                }))
+            )
+        }
+
+        function backtrack(groupIndex = 0) {
+            if (groupIndex === groupList.length) {
+                exploredLeaves++
+                if (exploredLeaves % 100000 === 0) {
+                    console.info(`${exploredLeaves.toLocaleString()} / ${totalLeaves.toLocaleString()} (${(100 * exploredLeaves / totalLeaves).toFixed(2)}%)`)
+                } if (
+                    profList.every(
+                        (prof, i) => (service._calculHeuresProf(prof) >= Number(prof.quantity))
+                            && (service._calculHeuresProf(prof) <= Number(prof.max))
+                            && Object.entries(prof.attribue)
+                                .every(entry => (
+                                    (service._getGroup(entry[0]).max[prof.name] === undefined || entry[1] <= service._getGroup(entry[0]).max[prof.name])
+                                    && (service._getGroup(entry[0]).min[prof.name] === undefined || entry[1] >= service._getGroup(entry[0]).min[prof.name])
+                                ))
+                    )
+                ) {
+                    saveSolution(profList)
+                }
                 return
             }
+            const group = groupList[groupIndex]
 
-            for (let qty = 0; qty <= remaining; qty++) {
-                profs[profIndex].attribue[group.name] = qty
-                currentHours[profIndex] += _getGroupHours(group, qty)
-                distribute(profIndex + 1, remaining - qty)
-                currentHours[profIndex] -= _getGroupHours(group, qty)
-                delete profs[profIndex].attribue[group.name]
+            function distribute(profIndex, remaining) {
+                if (profIndex === profList.length - 1) {
+                    const qty = remaining
+                    profList[profIndex].attribue[group.name] = qty
+                    backtrack(groupIndex + 1)
+                    delete profList[profIndex].attribue[group.name]
+                    return
+                }
+
+                for (let qty = Object.values(group.min).reduce((prev, cur) => prev + cur, 0); qty <= remaining; qty++) {
+                    if (qty > group.max[profList[profIndex].name] ?? Infinity) break
+                    profList[profIndex].attribue[group.name] = qty
+                    distribute(profIndex + 1, remaining - qty)
+                    delete profList[profIndex].attribue[group.name]
+                }
             }
+            distribute(0, group.quantity)
         }
-        distribute(0, group.quantity)
-    }
 
-    console.info(`Total théorique : ${totalLeaves.toLocaleString()}`)
+        console.info(`Total théorique : ${totalLeaves.toLocaleString()}`)
 
-    progress.style.display = "block"
-    backtrack()
-    progress.style.display = "none"
-    console.info("Backtrack terminé")
-    console.info(`Solutions trouvées : ${results.length}`)
-    return results
+        backtrack()
+        console.info("Backtrack terminé")
+        console.info(`Solutions trouvées : ${results.length}`)
+        return results
+    },
+
+    _calculHeuresProf: function(prof) {
+        return Object.entries(prof.attribue)
+            .reduce((prev, cur) => ["_", prev[1] + this._getGroupHours(this._getGroup(cur[0]), cur[1])], ["_", 0])[1] + this._getHeureChair(prof)
+    },
+
+    _getGroupHours: function (group, quantity) {
+        return quantity * group.heuresHebdo
+    },
+
+    _getGroup: function (groupName) {
+        const groupList = dao.getGroupList()
+        const group = groupList.filter(group => group.name === groupName).pop()
+        return group
+    },
+
+    _getProf: function (profName) {
+        const profList = dao.getProfList()
+        const prof = profList.filter(prof => prof.name === profName).pop()
+        return prof
+    },
+
+    _getHeureChair: function (prof) {
+        return Math.min(1,
+            Object.entries(prof.attribue)
+                .filter(entry => this._getGroup(entry[0]).chair)
+                .reduce((prev, cur) => ["_", prev[1] + this._getGroupHours(this._getGroup(cur[0]), cur[1]) * 0.1], ["_", 0])[1]
+        )
+    },
+
 }
-
-function _calculHeuresProf(prof) {
-    return Object.entries(prof.attribue)
-        .reduce((prev, cur) => ["_", prev[1] + _getGroupHours(_getGroup(cur[0]), cur[1])], ["_", 0])[1] + _getHeureChair(prof)
-}
-
-function _getGroupHours(group, quantity) {
-    return quantity * group.heuresHebdo
-}
-
-function _getGroup(groupName) {
-    const groupList = dao.getGroupList()
-    const group = groupList.filter(group => group.name === groupName).pop()
-    return group
-}
-
-function _getProf(profName) {
-    const profList = dao.getProfList()
-    const prof = profList.filter(prof => prof.name === profName).pop()
-    return prof
-}
-
-function _getHeureChair(prof) {
-    return Math.min(1,
-        Object.entries(prof.attribue)
-            .filter(entry => _getGroup(entry[0]).chair)
-            .reduce((prev, cur) => ["_", prev[1] + _getGroupHours(_getGroup(cur[0]), cur[1]) * 0.1], ["_", 0])[1]
-    )
-}
-
 

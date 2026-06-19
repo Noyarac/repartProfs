@@ -18,6 +18,7 @@
 </head>
 
 <body>
+    <script type="module" src="controller.js"></script>
     <h2>Profs</h2>
     <h3>Liste</h3>
     <table id="profList"></table>
@@ -37,15 +38,12 @@
     <button onclick="addGroup()">Ajouter</button>
 
     <h2>Actions</h2>
-    <button onclick="fixtures()">Fixtures</button>
-    <button onclick="drawPossibilities()">Générer</button>
+    <button id="fixturesBtn">Fixtures</button>
+    <button id="generateBtn">Générer</button>
 
     <h2>Possibilités <span id="possibilityNumber"><span></h2>
     <div id="progress" style="display: none;"></div>
     <div id="possibilities"></div>
-
-    <script src="controller.js"></script>
-
 </body>
 
 </html>
