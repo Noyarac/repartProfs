@@ -50,8 +50,8 @@ function fixtures() {
     addProf({ name: "Aurélie", quantity: 18, max: 23 })
     addGroup({ name: "2nd SES", heuresHebdo: 1.5, quantity: 6, chair: false, max: { "Stéphanie": 3, "Aurélie": 3, "Béné": 3 }, min: { "Aurélie": 1, "Stéphanie": 2 } }) // Aurélie min 1
     addGroup({ name: "2nd AP", heuresHebdo: 1, quantity: 1, chair: false, max: { "Stéphanie": 0, "Béné": 0 }, min: {} }) // que Aurélie
-    addGroup({ name: "1re SES", heuresHebdo: 4, quantity: 3, chair: true, max: { "Stéphanie": 1, "Aurélie": 2, "Béné": 2 }, min: {} })
-    addGroup({ name: "1re EPPCS", heuresHebdo: 1, quantity: 1, chair: true, max: { "Aurélie": 0, "Stéphanie": 0 }, min: {} }) // que Béné
+    addGroup({ name: "1re SES", heuresHebdo: 4, quantity: 3, chair: true, max: { "Stéphanie": 1, "Aurélie": 2, "Béné": 2 }, min: {"Béné": 1} })
+    addGroup({ name: "1re EPPCS", heuresHebdo: 1, quantity: 1, chair: true, max: { "Aurélie": 0, "Stéphanie": 0 }, min: {"Béné": 1} }) // que Béné
     addGroup({ name: "1re AP", heuresHebdo: 1, quantity: 1, chair: true, max: {}, min: {} })
     addGroup({ name: "Tle SES", heuresHebdo: 6, quantity: 2, chair: true, max: { "Béné": 0 }, min: {} })
     addGroup({ name: "Tle EMC", heuresHebdo: 0.5, quantity: 5, chair: true, max: { "Stéphanie": 2, "Aurélie": 2, "Béné": 2 }, min: {} })

@@ -51,24 +51,31 @@ export const service = {
 
         const results = []
 
+        function countGroupLeaves(group, profs) {
+            const target = group.quantity
+            const n = profs.length
+            let dp = new Array(target + 1).fill(1)
+            for (let i = n - 2; i >= 0; i--) {
+                const minQ = group.min[profs[i].name] ?? 0
+                const maxQ = group.max[profs[i].name] ?? Infinity
+                const newDp = new Array(target + 1).fill(0)
+                for (let r = 0; r <= target; r++) {
+                    let total = 0
+                    for (let q = minQ; q <= Math.min(r, maxQ); q++) {
+                        total += dp[r - q]
+                    }
+                    newDp[r] = total
+                }
+                dp = newDp
+            }
+            return dp[target]
+        }
+
         const totalLeaves = groupList.reduce(
-            (acc, group) =>
-                acc * combination(
-                    (group.quantity - Object.values(group.min).reduce((acc, cur) => acc + cur, 0)) + profList.length - 1,
-                    profList.length - 1
-                ),
+            (acc, group) => acc * countGroupLeaves(group, profList),
             1
         )
         let exploredLeaves = 0
-
-        function combination(n, k) {
-            let result = 1
-            for (let i = 1; i <= k; i++) {
-                result *= (n - k + i)
-                result /= i
-            }
-            return result
-        }
 
         function saveSolution(profs) {
             results.push(
@@ -83,7 +90,7 @@ export const service = {
         function backtrack(groupIndex = 0) {
             if (groupIndex === groupList.length) {
                 exploredLeaves++
-                if (exploredLeaves % 100000 === 0) {
+                if (exploredLeaves % 10000 === 0) {
                     console.info(`${exploredLeaves.toLocaleString()} / ${totalLeaves.toLocaleString()} (${(100 * exploredLeaves / totalLeaves).toFixed(2)}%)`)
                 } if (
                     profList.every(
@@ -111,7 +118,7 @@ export const service = {
                     return
                 }
 
-                for (let qty = Object.values(group.min).reduce((prev, cur) => prev + cur, 0); qty <= remaining; qty++) {
+                for (let qty = group.min[profList[profIndex].name] ?? 0; qty <= remaining; qty++) {
                     if (qty > group.max[profList[profIndex].name] ?? Infinity) break
                     profList[profIndex].attribue[group.name] = qty
                     distribute(profIndex + 1, remaining - qty)
