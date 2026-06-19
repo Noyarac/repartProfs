@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        table,
+        td {
+            border: 1px solid black;
+        }
+
+        table {
+            margin: 0.5em
+        }
+    </style>
+</head>
+
+<body>
+    <h2>Profs</h2>
+    <h3>Liste</h3>
+    <table id="profList"></table>
+    <h3>Ajouter</h3>
+    <input type="text" id="newProfName" placeholder="Nom" />
+    <input type="number" id="newProfQuantity" placeholder="Heures" />
+    <button onclick="addProf()">Ajouter</button>
+
+    <h2>Groupes</h2>
+    <h3>Liste</h3>
+    <table id="groupList"></table>
+    <h3>Ajouter</h3>
+    <input type="text" id="newGroupName" placeholder="Nom" />
+    <input type="number" id="newGroupHeuresHebdo" placeholder="Heures hebdo" />
+    <input type="number" id="newGroupQuantity" placeholder="Quantité" />
+    <input type="checkbox" id="newGroupChair" checked /> Chair ?
+    <button onclick="addGroup()">Ajouter</button>
+
+    <h2>Actions</h2>
+    <button onclick="fixtures()">Fixtures</button>
+    <button onclick="drawPossibilities()">Générer</button>
+
+    <h2>Possibilités <span id="possibilityNumber"><span></h2>
+    <div id="progress" style="display: none;"></div>
+    <div id="possibilities"></div>
+
+    <script src="controller.js"></script>
+
+</body>
+
+</html>
