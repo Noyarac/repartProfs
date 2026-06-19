@@ -18,24 +18,27 @@
 </head>
 
 <body>
-    <script type="module" src="controller.js"></script>
     <h2>Profs</h2>
     <h3>Liste</h3>
     <table id="profList"></table>
     <h3>Ajouter</h3>
     <input type="text" id="newProfName" placeholder="Nom" />
     <input type="number" id="newProfQuantity" placeholder="Heures" />
-    <button onclick="addProf()">Ajouter</button>
+    <input type="number" id="newProfMax" placeholder="Max" />
+    <button id="addProfBtn">Ajouter</button>
 
     <h2>Groupes</h2>
     <h3>Liste</h3>
     <table id="groupList"></table>
     <h3>Ajouter</h3>
+    <form id="groupForm">
     <input type="text" id="newGroupName" placeholder="Nom" />
     <input type="number" id="newGroupHeuresHebdo" placeholder="Heures hebdo" />
     <input type="number" id="newGroupQuantity" placeholder="Quantité" />
     <input type="checkbox" id="newGroupChair" checked /> Chair ?
-    <button onclick="addGroup()">Ajouter</button>
+    <button id="addGroupBtn" type="button">Ajouter</button>
+
+    </form>
 
     <h2>Actions</h2>
     <button id="fixturesBtn">Fixtures</button>
@@ -44,6 +47,7 @@
     <h2>Possibilités <span id="possibilityNumber"><span></h2>
     <div id="progress" style="display: none;"></div>
     <div id="possibilities"></div>
+    <script src="dist/app.js"></script>
 </body>
 
 </html>

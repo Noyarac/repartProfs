@@ -1,0 +1,25 @@
+{
+  "name": "repartprofs",
+  "version": "1.0.0",
+  "description": "",
+  "main": "controller.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "esbuild src/controller.js --bundle --outfile=dist/app.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Noyarac/repartProfs.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/Noyarac/repartProfs/issues"
+  },
+  "homepage": "https://github.com/Noyarac/repartProfs#readme",
+  "devDependencies": {
+    "esbuild": "^0.28.1"
+  }
+}

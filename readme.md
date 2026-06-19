@@ -1,0 +1,1 @@
+To bundle, run `npx esbuild src/controller.js --bundle --outfile=dist/app.js`
