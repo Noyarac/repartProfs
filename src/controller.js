@@ -27,6 +27,7 @@ function groupUp(groupName) {
 
 function groupDown(groupName) {
     service.groupDown(groupName)
+    drawGroupList()
 }
 
 function _getValue(id) {
