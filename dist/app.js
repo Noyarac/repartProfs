@@ -211,6 +211,7 @@
       }
       function groupDown(groupName) {
         service.groupDown(groupName);
+        drawGroupList();
       }
       function _getValue(id) {
         const input = document.getElementById(id);
