@@ -65,6 +65,18 @@
           groupList = groupList.filter((group) => group.name !== nameOfGroupToRemove);
           dao.saveGroupList(groupList);
         },
+        groupUp: function(groupName) {
+          let groupList = dao.getGroupList();
+          const groupIndex = groupList.findIndex((group) => group.name === groupName);
+          const newGroupList = [...groupList.slice(0, groupIndex - 1), groupList[groupIndex], groupList[groupIndex - 1], ...groupList.slice(groupIndex + 1)];
+          dao.saveGroupList(newGroupList);
+        },
+        groupDown: function(groupName) {
+          let groupList = dao.getGroupList();
+          const groupIndex = groupList.findIndex((group) => group.name === groupName);
+          const newGroupList = [...groupList.slice(0, groupIndex), groupList[groupIndex + 1], groupList[groupIndex], ...groupList.slice(groupIndex + 2)];
+          dao.saveGroupList(newGroupList);
+        },
         generateDistributions: function() {
           const service2 = this;
           const groupList = dao.getGroupList();
@@ -187,9 +199,18 @@
       function drawGroupList() {
         const groupList = service.getGroupList();
         const groupListTable = document.getElementById("groupList");
-        const innerHTML = `<tr><th>Nom</th><th>Heures Hebdo</th><th>Quantit\xE9</th>${service.getProfList().map((prof) => `<th>${prof.name} min</th><th>${prof.name} max</th>`).join("")}</tr>` + groupList.map((group) => `<tr><td>${group.name}</td><td>${group.heuresHebdo}</td><td>${group.quantity}</td>${service.getProfList().map((prof) => `<td>${group.min[prof.name] ?? ""}</td><td>${group.max[prof.name] ?? ""}</td>`).join("")}<td><button id="${group.name}RemoveBtn">Supprimer</button></td></tr>`).join("");
+        const innerHTML = `<tr><th>Nom</th><th>Heures Hebdo</th><th>Quantit\xE9</th>${service.getProfList().map((prof) => `<th>${prof.name} min</th><th>${prof.name} max</th>`).join("")}</tr>` + groupList.map((group) => `<tr><td>${group.name}</td><td>${group.heuresHebdo}</td><td>${group.quantity}</td>${service.getProfList().map((prof) => `<td>${group.min[prof.name] ?? ""}</td><td>${group.max[prof.name] ?? ""}</td>`).join("")}<td><button id="${group.name}RemoveBtn">Supprimer</button></td><td><button id="${group.name}UpBtn">Haut</button></td><td><button id="${group.name}DownBtn">Bas</button></td></tr>`).join("");
         groupListTable.innerHTML = innerHTML;
         groupList.forEach((group) => document.getElementById(`${group.name}RemoveBtn`).addEventListener("click", () => removeGroup(group.name)));
+        groupList.forEach((group) => document.getElementById(`${group.name}UpBtn`).addEventListener("click", () => groupUp(group.name)));
+        groupList.forEach((group) => document.getElementById(`${group.name}DownBtn`).addEventListener("click", () => groupDown(group.name)));
+      }
+      function groupUp(groupName) {
+        service.groupUp(groupName);
+        drawGroupList();
+      }
+      function groupDown(groupName) {
+        service.groupDown(groupName);
       }
       function _getValue(id) {
         const input = document.getElementById(id);

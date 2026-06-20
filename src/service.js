@@ -37,6 +37,20 @@ export const service = {
         dao.saveGroupList(groupList)
     },
 
+    groupUp: function (groupName) {
+        let groupList = dao.getGroupList()
+        const groupIndex = groupList.findIndex(group => group.name === groupName)
+        const newGroupList = [...groupList.slice(0,groupIndex - 1), groupList[groupIndex], groupList[groupIndex - 1], ...groupList.slice(groupIndex + 1)]
+        dao.saveGroupList(newGroupList)
+    },
+
+    groupDown: function (groupName) {
+        let groupList = dao.getGroupList()
+        const groupIndex = groupList.findIndex(group => group.name === groupName)
+        const newGroupList = [...groupList.slice(0,groupIndex), groupList[groupIndex + 1], groupList[groupIndex], ...groupList.slice(groupIndex + 2)]
+        dao.saveGroupList(newGroupList)
+    },
+
     generateDistributions: function () {
         const service = this
         const groupList = dao.getGroupList()
