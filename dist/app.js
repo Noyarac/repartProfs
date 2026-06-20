@@ -190,7 +190,7 @@
       function drawProfList() {
         const profList = service.getProfList();
         const profListTable = document.getElementById("profList");
-        const innerHTML = "<tr><th>Nom</th><th>Heures</th></tr>" + profList.map((prof) => `<tr><td>${prof.name}</td><td>${prof.quantity}</td><td>${prof.max}</td><td><button id="${prof.name}RemoveBtn">Supprimer</button></td></tr>`).join("");
+        const innerHTML = "<tr><th>Nom</th><th>Min</th><th>Max</th><th>Supprimer</th></tr>" + profList.map((prof) => `<tr><td>${prof.name}</td><td>${prof.quantity}</td><td>${prof.max}</td><td><button id="${prof.name}RemoveBtn">Supprimer</button></td></tr>`).join("");
         profListTable.innerHTML = innerHTML;
         profList.forEach((prof) => document.getElementById(`${prof.name}RemoveBtn`).addEventListener("click", () => removeProf(prof.name)));
         document.querySelectorAll("input[name*=_max], input[name*=_min]").forEach((element) => element.parentElement.removeChild(element));
@@ -199,7 +199,7 @@
       function drawGroupList() {
         const groupList = service.getGroupList();
         const groupListTable = document.getElementById("groupList");
-        const innerHTML = `<tr><th>Nom</th><th>Heures Hebdo</th><th>Quantit\xE9</th>${service.getProfList().map((prof) => `<th>${prof.name} min</th><th>${prof.name} max</th>`).join("")}</tr>` + groupList.map((group) => `<tr><td>${group.name}</td><td>${group.heuresHebdo}</td><td>${group.quantity}</td>${service.getProfList().map((prof) => `<td>${group.min[prof.name] ?? ""}</td><td>${group.max[prof.name] ?? ""}</td>`).join("")}<td><button id="${group.name}RemoveBtn">Supprimer</button></td><td><button id="${group.name}UpBtn">Haut</button></td><td><button id="${group.name}DownBtn">Bas</button></td></tr>`).join("");
+        const innerHTML = `<tr><th>Nom</th><th>Heures Hebdo</th><th>Quantit\xE9</th>${service.getProfList().map((prof) => `<th>${prof.name} min</th><th>${prof.name} max</th>`).join("")}<th>Supprimer</th><th>Haut</th><th>Bas</th></tr>` + groupList.map((group) => `<tr><td>${group.name}</td><td>${group.heuresHebdo}</td><td>${group.quantity}</td>${service.getProfList().map((prof) => `<td>${group.min[prof.name] ?? ""}</td><td>${group.max[prof.name] ?? ""}</td>`).join("")}<td><button id="${group.name}RemoveBtn">Supprimer</button></td><td><button id="${group.name}UpBtn">Haut</button></td><td><button id="${group.name}DownBtn">Bas</button></td></tr>`).join("");
         groupListTable.innerHTML = innerHTML;
         groupList.forEach((group) => document.getElementById(`${group.name}RemoveBtn`).addEventListener("click", () => removeGroup(group.name)));
         groupList.forEach((group) => document.getElementById(`${group.name}UpBtn`).addEventListener("click", () => groupUp(group.name)));
@@ -242,13 +242,13 @@
       }
       function _addProfMinMaxInputs(prof) {
         const form = document.getElementById("groupForm");
-        const btn = document.getElementById("addGroupBtn");
+        const boundary = document.getElementById("profMinMaxBoundary");
         for (const data of ["min", "max"]) {
           const element = document.createElement("input");
           element.type = "number";
           element.name = prof.name + "_" + data;
           element.placeholder = prof.name + " " + data;
-          form.insertBefore(element, btn);
+          form.insertBefore(element, boundary);
         }
       }
       function fixtures() {
