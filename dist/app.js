@@ -111,7 +111,7 @@
           function backtrack(groupIndex = 0) {
             if (groupIndex === groupList.length) {
               exploredLeaves++;
-              if (exploredLeaves % 1e4 === 0) {
+              if (exploredLeaves % 1e3 === 0) {
                 console.info(`${exploredLeaves.toLocaleString()} / ${totalLeaves.toLocaleString()} (${(100 * exploredLeaves / totalLeaves).toFixed(2)}%)`);
               }
               if (profList.every(
@@ -178,15 +178,18 @@
       function drawProfList() {
         const profList = service.getProfList();
         const profListTable = document.getElementById("profList");
-        const innerHTML = "<tr><th>Nom</th><th>Heures</th></tr>" + profList.map((prof) => `<tr><td>${prof.name}</td><td>${prof.quantity}</td><td>${prof.max}</td><td><button onclick="removeProf('${prof.name}')">Supprimer</button></td></tr>`).join("");
+        const innerHTML = "<tr><th>Nom</th><th>Heures</th></tr>" + profList.map((prof) => `<tr><td>${prof.name}</td><td>${prof.quantity}</td><td>${prof.max}</td><td><button id="${prof.name}RemoveBtn">Supprimer</button></td></tr>`).join("");
         profListTable.innerHTML = innerHTML;
+        profList.forEach((prof) => document.getElementById(`${prof.name}RemoveBtn`).addEventListener("click", () => removeProf(prof.name)));
+        document.querySelectorAll("input[name*=_max], input[name*=_min]").forEach((element) => element.parentElement.removeChild(element));
         profList.forEach((prof) => _addProfMinMaxInputs(prof));
       }
       function drawGroupList() {
         const groupList = service.getGroupList();
         const groupListTable = document.getElementById("groupList");
-        const innerHTML = `<tr><th>Nom</th><th>Heures Hebdo</th><th>Quantit\xE9</th>${service.getProfList().map((prof) => `<th>${prof.name} min</th><th>${prof.name} max</th>`).join("")}</tr>` + groupList.map((group) => `<tr><td>${group.name}</td><td>${group.heuresHebdo}</td><td>${group.quantity}</td>${service.getProfList().map((prof) => `<td>${group.min[prof.name] ?? ""}</td><td>${group.max[prof.name] ?? ""}</td>`).join("")}<td><button onclick="removeGroup('${group.name}')">Supprimer</button></td></tr>`).join("");
+        const innerHTML = `<tr><th>Nom</th><th>Heures Hebdo</th><th>Quantit\xE9</th>${service.getProfList().map((prof) => `<th>${prof.name} min</th><th>${prof.name} max</th>`).join("")}</tr>` + groupList.map((group) => `<tr><td>${group.name}</td><td>${group.heuresHebdo}</td><td>${group.quantity}</td>${service.getProfList().map((prof) => `<td>${group.min[prof.name] ?? ""}</td><td>${group.max[prof.name] ?? ""}</td>`).join("")}<td><button id="${group.name}RemoveBtn">Supprimer</button></td></tr>`).join("");
         groupListTable.innerHTML = innerHTML;
+        groupList.forEach((group) => document.getElementById(`${group.name}RemoveBtn`).addEventListener("click", () => removeGroup(group.name)));
       }
       function _getValue(id) {
         const input = document.getElementById(id);
@@ -199,6 +202,10 @@
         service.addProf(newProf);
         drawProfList();
       }
+      function removeProf(nameOfProfToRemove) {
+        service.removeProf(nameOfProfToRemove);
+        drawProfList();
+      }
       function addGroup(group = void 0) {
         const form = document.getElementById("groupForm");
         const data = Array.from(new FormData(form).entries());
@@ -206,6 +213,10 @@
         const min = Object.fromEntries(data.filter((entry) => entry[0].match(/_min/)).map((entry) => [entry[0].split("_min").shift(), Number.parseFloat(entry[1])]));
         const newGroup = group.heuresHebdo ? group : { name: _getValue("newGroupName"), heuresHebdo: _getValue("newGroupHeuresHebdo"), quantity: _getValue("newGroupQuantity"), chair: _getValue("newGroupChair") === 1 ? true : false, min, max };
         service.addGroup(newGroup);
+        drawGroupList();
+      }
+      function removeGroup(nameOfGroupToRemove) {
+        service.removeGroup(nameOfGroupToRemove);
         drawGroupList();
       }
       function _addProfMinMaxInputs(prof) {

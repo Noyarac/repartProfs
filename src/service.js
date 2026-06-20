@@ -90,7 +90,7 @@ export const service = {
         function backtrack(groupIndex = 0) {
             if (groupIndex === groupList.length) {
                 exploredLeaves++
-                if (exploredLeaves % 10000 === 0) {
+                if (exploredLeaves % 1000 === 0) {
                     console.info(`${exploredLeaves.toLocaleString()} / ${totalLeaves.toLocaleString()} (${(100 * exploredLeaves / totalLeaves).toFixed(2)}%)`)
                 } if (
                     profList.every(

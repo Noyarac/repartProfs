@@ -3,16 +3,19 @@ import { service } from "./service.js"
 function drawProfList() {
     const profList = service.getProfList()
     const profListTable = document.getElementById("profList")
-    const innerHTML = "<tr><th>Nom</th><th>Heures</th></tr>" + profList.map(prof => `<tr><td>${prof.name}</td><td>${prof.quantity}</td><td>${prof.max}</td><td><button onclick="removeProf('${prof.name}')">Supprimer</button></td></tr>`).join("")
+    const innerHTML = "<tr><th>Nom</th><th>Heures</th></tr>" + profList.map(prof => `<tr><td>${prof.name}</td><td>${prof.quantity}</td><td>${prof.max}</td><td><button id="${prof.name}RemoveBtn">Supprimer</button></td></tr>`).join("")
     profListTable.innerHTML = innerHTML
+    profList.forEach(prof => document.getElementById(`${prof.name}RemoveBtn`).addEventListener("click", () => removeProf(prof.name)))
+    document.querySelectorAll("input[name*=_max], input[name*=_min]").forEach(element => element.parentElement.removeChild(element))
     profList.forEach(prof => _addProfMinMaxInputs(prof))
 }
 
 function drawGroupList() {
     const groupList = service.getGroupList()
     const groupListTable = document.getElementById("groupList")
-    const innerHTML = `<tr><th>Nom</th><th>Heures Hebdo</th><th>Quantité</th>${service.getProfList().map(prof => `<th>${prof.name} min</th><th>${prof.name} max</th>`).join("")}</tr>` + groupList.map(group => `<tr><td>${group.name}</td><td>${group.heuresHebdo}</td><td>${group.quantity}</td>${service.getProfList().map(prof => `<td>${group.min[prof.name] ?? ""}</td><td>${group.max[prof.name] ?? ""}</td>`).join("")}<td><button onclick="removeGroup('${group.name}')">Supprimer</button></td></tr>`).join("")
+    const innerHTML = `<tr><th>Nom</th><th>Heures Hebdo</th><th>Quantité</th>${service.getProfList().map(prof => `<th>${prof.name} min</th><th>${prof.name} max</th>`).join("")}</tr>` + groupList.map(group => `<tr><td>${group.name}</td><td>${group.heuresHebdo}</td><td>${group.quantity}</td>${service.getProfList().map(prof => `<td>${group.min[prof.name] ?? ""}</td><td>${group.max[prof.name] ?? ""}</td>`).join("")}<td><button id="${group.name}RemoveBtn">Supprimer</button></td></tr>`).join("")
     groupListTable.innerHTML = innerHTML
+    groupList.forEach(group => document.getElementById(`${group.name}RemoveBtn`).addEventListener("click", () => removeGroup(group.name)))
 }
 
 function _getValue(id) {
@@ -58,6 +61,11 @@ function _addProfMinMaxInputs(prof) {
         element.placeholder = prof.name + " " + data
         form.insertBefore(element, btn)
     }
+}
+
+function _removeProfMinMaxInputs(prof) {
+    const inputs = document.querySelectorAll(`input[name=${prof.name}_max], input[name=${prof.name}_min]`)
+    inputs.forEach(element => element.parentElement.removeChild(element))
 }
 
 function fixtures() {
