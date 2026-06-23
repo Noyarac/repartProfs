@@ -143,7 +143,7 @@
                 return;
               }
               for (let qty = group.min[profList[profIndex].name] ?? 0; qty <= remaining; qty++) {
-                if (qty > group.max[profList[profIndex].name]) break;
+                if (qty > (group.max[profList[profIndex].name] ?? Infinity)) break;
                 profList[profIndex].attribue[group.name] = qty;
                 distribute(profIndex + 1, remaining - qty);
                 delete profList[profIndex].attribue[group.name];
