@@ -220,7 +220,7 @@
         return value;
       }
       function addProf(prof = void 0) {
-        const newProf = prof.quantity ? prof : { name: _getValue("newProfName"), quantity: _getValue("newProfQuantity"), max: _getValue("newProfMax") };
+        const newProf = prof.quantity ? prof : { name: _getValue("newProfName"), quantity: Number.parseInt(_getValue("newProfQuantity")), max: Number.parseFloat(_getValue("newProfMax")) };
         service.addProf(newProf);
         drawProfList();
       }
@@ -233,7 +233,7 @@
         const data = Array.from(new FormData(form).entries());
         const max = Object.fromEntries(data.filter((entry) => entry[0].match(/_max/)).map((entry) => [entry[0].split("_max").shift(), Number.parseFloat(entry[1])]));
         const min = Object.fromEntries(data.filter((entry) => entry[0].match(/_min/)).map((entry) => [entry[0].split("_min").shift(), Number.parseFloat(entry[1])]));
-        const newGroup = group.heuresHebdo ? group : { name: _getValue("newGroupName"), heuresHebdo: _getValue("newGroupHeuresHebdo"), quantity: _getValue("newGroupQuantity"), chair: _getValue("newGroupChair") === 1 ? true : false, min, max };
+        const newGroup = group.heuresHebdo ? group : { name: _getValue("newGroupName"), heuresHebdo: Number.parseFloat(_getValue("newGroupHeuresHebdo")), quantity: Number.parseInt(_getValue("newGroupQuantity")), chair: _getValue("newGroupChair") === 1 ? true : false, min, max };
         service.addGroup(newGroup);
         drawGroupList();
       }
