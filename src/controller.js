@@ -53,7 +53,7 @@ function addGroup(group = undefined) {
     const data = Array.from(new FormData(form).entries())
     const max = Object.fromEntries(data.filter(entry => entry[0].match(/_max/) && entry[1].length > 0).map(entry => [entry[0].split("_max").shift(), Number.parseFloat(entry[1])]))
     const min = Object.fromEntries(data.filter(entry => entry[0].match(/_min/) && entry[1].length > 0).map(entry => [entry[0].split("_min").shift(), Number.parseFloat(entry[1])]))
-    const newGroup = group.heuresHebdo ? group : { name: _getValue("newGroupName"), heuresHebdo: Number.parseFloat(_getValue("newGroupHeuresHebdo")), quantity: Number.parseInt(_getValue("newGroupQuantity")), chair: _getValue("newGroupChair") === 1 ? true : false, min, max }
+    const newGroup = group.heuresHebdo ? group : { name: _getValue("newGroupName"), heuresHebdo: Number.parseFloat(_getValue("newGroupHeuresHebdo")), quantity: Number.parseInt(_getValue("newGroupQuantity")), chair: document.getElementById("newGroupChair").checked, min, max }
     service.addGroup(newGroup)
     drawGroupList()
 }
